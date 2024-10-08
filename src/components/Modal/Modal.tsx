@@ -4,9 +4,10 @@ import { useRouter } from 'next/navigation'; // Import useRouter for navigation
 // Define prop types for the component
 interface ModalProps {
   isOpen: boolean;
+  onClose: () => void;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const [showSecondModal, setShowSecondModal] = useState(false); // State for second modal
   const router = useRouter(); // Initialize router for navigation
 
