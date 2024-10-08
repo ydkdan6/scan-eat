@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation'; // Import useRouter for navigation
 
-const Modal = ({isOpen}) => {
+// Define prop types for the component
+interface ModalProps {
+  isOpen: boolean;
+}
+
+const Modal: React.FC<ModalProps> = ({ isOpen }) => {
   const [showSecondModal, setShowSecondModal] = useState(false); // State for second modal
   const router = useRouter(); // Initialize router for navigation
 
-  if (!isOpen) return null; // Do not render if not open
+  if (!isOpen) return null; // Do not render if modal is not open
 
   const handleCloseFirstModal = () => {
     setShowSecondModal(true); // Open second modal on close button click
   };
-
-  // const handleCloseSecondModal = () => {
-  //   setShowSecondModal(false); // Close second modal
-  //   onClose(); // Call parent onClose to fully close the modal flow
-  // };
 
   const handleOrderAgain = () => {
     setShowSecondModal(false); // Close second modal
@@ -23,7 +23,7 @@ const Modal = ({isOpen}) => {
 
   const handleGoToBlankPage = () => {
     setShowSecondModal(false); // Close second modal
-    router.push('/BlankPage'); // Navigate to a blank page (you can create a blank page in your app)
+    router.push('/BlankPage'); // Navigate to a blank page
   };
 
   return (
@@ -48,7 +48,7 @@ const Modal = ({isOpen}) => {
         </div>
       )}
 
-      {/* Second Modal (Would you like to order again?) */}
+      {/* Second Modal */}
       {showSecondModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-6 max-w-sm w-full text-center">

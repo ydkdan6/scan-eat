@@ -1,16 +1,35 @@
+type CartItem = {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  quantity: number;
+  table: string | null; // Include table if needed
+};
+
+
+
 "use client";
 
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
-// Create CartContext
-const CartContext = createContext(null);
+// Create CartContext with proper type definition
+interface CartContextType {
+  cartItems: CartItem[];
+  addToCart: (item: CartItem) => void;
+  removeFromCart: (itemName: string) => void;
+}
+
+// Create the context with a default value of null
+const CartContext = createContext<CartContextType | null>(null);
 
 // Create CartProvider
-export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
+export const CartProvider = ({ children }: { children: ReactNode }) => {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]); // Type cartItems as an array of CartItem
 
   // Function to add items to the cart
-  const addToCart = (item) => {
+  const addToCart = (item: CartItem) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((i) => i.name === item.name);
 
@@ -22,12 +41,12 @@ export const CartProvider = ({ children }) => {
       }
 
       // If it's a new item, add it to the cart
-      return [...prevItems, { ...item, quantity: item.quantity }];
+      return [...prevItems, { ...item }];
     });
   };
 
   // Function to remove an item from the cart
-  const removeFromCart = (itemName) => {
+  const removeFromCart = (itemName: string) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.name !== itemName));
   };
 
@@ -39,7 +58,7 @@ export const CartProvider = ({ children }) => {
 };
 
 // Custom hook to use CartContext
-export const useCart = () => {
+export const useCart = (): CartContextType => {
   const context = useContext(CartContext);
 
   if (!context) {
