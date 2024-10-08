@@ -8,7 +8,7 @@ interface QRCodeGeneratorProps {
 
 const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ restaurantId, table }) => {
   //  URL  encoded into the QR code
-  const qrCodeValue = `https://metro-eat.vercel.app/`;
+  const qrCodeValue = `https://scan-eat.vercel.app/`;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 to-indigo-600">
