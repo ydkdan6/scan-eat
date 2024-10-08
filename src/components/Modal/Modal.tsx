@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation'; // Import useRouter for navigation
 
-const Modal = ({ isOpen, onClose }) => {
+const Modal = ({isOpen}) => {
   const [showSecondModal, setShowSecondModal] = useState(false); // State for second modal
   const router = useRouter(); // Initialize router for navigation
 
@@ -11,10 +11,10 @@ const Modal = ({ isOpen, onClose }) => {
     setShowSecondModal(true); // Open second modal on close button click
   };
 
-  const handleCloseSecondModal = () => {
-    setShowSecondModal(false); // Close second modal
-    onClose(); // Call parent onClose to fully close the modal flow
-  };
+  // const handleCloseSecondModal = () => {
+  //   setShowSecondModal(false); // Close second modal
+  //   onClose(); // Call parent onClose to fully close the modal flow
+  // };
 
   const handleOrderAgain = () => {
     setShowSecondModal(false); // Close second modal

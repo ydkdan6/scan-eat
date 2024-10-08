@@ -8,7 +8,7 @@ import { useCart } from '@/context/CartContext'; // Import your cart context
 
 const MenuPage = () => {
   const router = useRouter(); // Initialize the router hook from next/navigation
-  const { restaurantId } = useParams(); // Get params using next/navigation
+  // const { restaurantId } = useParams(); // Get params using next/navigation
   const { addToCart } = useCart(); // Destructure addToCart from the cart context
   const [table, setTable] = useState(null); // State to store table information
   const [quantities, setQuantities] = useState<{ [key: number]: number }>({}); // State for tracking item quantities
@@ -25,6 +25,7 @@ const MenuPage = () => {
 
   useEffect(() => {
     // Set up table data on mount and check for client-side rendering
+    
     setIsMounted(true); // Marks the component as mounted on the client-side
     if (typeof window !== 'undefined') {
       const tableFromUrl = new URLSearchParams(window.location.search).get('table');
@@ -32,10 +33,14 @@ const MenuPage = () => {
     }
   }, []);
 
+  if (!isMounted) {
+    return null; // Or some loading spinner if desired
+  }
+
   // Handle Order Button Click
   const handleOrder = (item) => {
     const quantity = quantities[item.id] || 0;
-    addToCart({ ...item, quantity }); // Add the item to the cart
+    addToCart({ ...item, quantity, table }); // Add the item to the cart
     router.push('/orders'); // Navigate to the cart page after adding the item
   };
 
