@@ -10,7 +10,10 @@ const Modal: React.FC<ModalProps> = ({ isOpen }) => {
   const [showSecondModal, setShowSecondModal] = useState(false); // State for second modal
   const router = useRouter(); // Initialize router for navigation
 
-  if (!isOpen) return null; // Do not render if modal is not open
+  // If modal is not open, return null to prevent rendering
+  if (!isOpen) {
+    return null;
+  }
 
   const handleCloseFirstModal = () => {
     setShowSecondModal(true); // Open second modal on close button click
