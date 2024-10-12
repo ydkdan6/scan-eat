@@ -14,6 +14,7 @@ const MenuPage = () => {
   const [quantities, setQuantities] = useState<{ [key: number]: number }>({}); // State for tracking item quantities
   const [isMounted, setIsMounted] = useState(false); // Ensure client-side mounting
   const [searchQuery, setSearchQuery] = useState(""); // State for the search input
+  const [likedItems, setLikedItems] = useState<{ [key: number]: boolean }>({});
 
 
   type MenuItem = {
@@ -97,6 +98,14 @@ const MenuPage = () => {
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+
+  const toggleLike = (itemId: number) => {
+    setLikedItems((prevLikedItems) => ({
+      ...prevLikedItems,
+      [itemId]: !prevLikedItems[itemId], // Toggle the liked state for this specific item
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-gray-10">
       <header className="bg-gray-10">
@@ -157,8 +166,9 @@ const MenuPage = () => {
               {/* Wishlist Heart Icon and Order Button */}
               <div className="ml-4 flex flex-col items-center">
                 {/* Heart Icon */}
-                <button className="mb-6 ml-7 p-1 text-red-500 transition-colors duration-200">
-                  <HeartIcon className="h-8 w-8 fill-white" />
+                <button className="mb-6 ml-7 p-1 text-red-500 transition-colors duration-200" onClick={() => toggleLike(item.id)}>
+                  <HeartIcon  className={`h-8 w-8 cursor-pointer transition-all duration-300 ease-in-out 
+         ${likedItems[item.id] ? 'text-orange-500 fill-orange-600 scale-125' : 'text-red-500'}`} />
                 </button>
 
                 {/* Order Button */}
