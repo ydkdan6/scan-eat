@@ -19,6 +19,7 @@ interface CartContextType {
   cartItems: CartItem[];
   addToCart: (item: CartItem) => void;
   removeFromCart: (itemName: string) => void;
+  updateQuantity: (itemName: string, quantity: number) => void;
 }
 
 // Create the context with a default value of null
@@ -36,7 +37,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       // If the item already exists in the cart, update the quantity
       if (existingItem) {
         return prevItems.map((i) =>
-          i.name === item.name ? { ...i, quantity: i.quantity + item.quantity } : i
+          i.name === item.name ? { ...i, quantity: item.quantity } : i
         );
       }
 
@@ -50,8 +51,18 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.name !== itemName));
   };
 
+
+  const updateQuantity = (itemName: string, quantity: number) => {
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.name === itemName ? { ...item, quantity } : item
+      )
+    );
+  };
+
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity }}>
       {children}
     </CartContext.Provider>
   );

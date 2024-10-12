@@ -1,21 +1,18 @@
 "use client";
 
-// import { useParams } from 'next/navigation'; // Import useParams from next/navigation
 import { useEffect, useState } from "react";
 import { HeartIcon } from "@heroicons/react/outline";
-import { useRouter } from "next/navigation"; // Correct router import for the new App Directory
-import { useCart } from "@/context/CartContext"; // Import your cart context
+import { useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
+import { useMenu } from "@/context/MenuContext"; // Import MenuContext
 
 const MenuPage = () => {
-  const router = useRouter(); // Initialize the router hook from next/navigation
-  // const { restaurantId } = useParams(); // Get params using next/navigation
-  const { addToCart } = useCart(); // Destructure addToCart from the cart context
-  const [table, setTable] = useState<string | null>(null); // State to store table information
-  const [quantities, setQuantities] = useState<{ [key: number]: number }>({}); // State for tracking item quantities
-  const [isMounted, setIsMounted] = useState(false); // Ensure client-side mounting
-  const [searchQuery, setSearchQuery] = useState(""); // State for the search input
-  const [likedItems, setLikedItems] = useState<{ [key: number]: boolean }>({});
-
+  const router = useRouter();
+  const { addToCart, cartItems  } = useCart();
+  const { quantities, likedItems, updateQuantity, toggleLike } = useMenu(); // Destructure context values
+  const [table, setTable] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   type MenuItem = {
     id: number;
@@ -25,86 +22,47 @@ const MenuPage = () => {
     image: string;
   };
 
-  
   // Mock menu data
-  const menuItems = [
-    {
-      id: 1,
-      name: "Jollof Rice",
-      description: "Delicious jollof rice",
-      price: 3000,
-      image: "/images/image2.jpeg",
-    },
-    {
-      id: 2,
-      name: "Fried Rice",
-      description: "Tasty fried rice",
-      price: 2500,
-      image: "/images/img1.jpeg",
-    },
-    {
-      id: 3,
-      name: "Spaghetti",
-      description: "Italian spaghetti",
-      price: 2000,
-      image: "/images/image2.jpeg",
-    },
-    {
-      id: 4,
-      name: "Afang Soup",
-      description: "Traditional soup",
-      price: 3000,
-      image: "/images/img1.jpeg",
-    },
+  const menuItems: MenuItem[] = [
+    { id: 1, name: "Jollof Rice", description: "Delicious jollof rice", price: 3000, image: "/images/image2.jpeg" },
+    { id: 2, name: "Fried Rice", description: "Tasty fried rice", price: 2500, image: "/images/img1.jpeg" },
+    { id: 3, name: "Spaghetti", description: "Italian spaghetti", price: 2000, image: "/images/image2.jpeg" },
+    { id: 4, name: "Afang Soup", description: "Traditional soup", price: 3000, image: "/images/img1.jpeg" },
   ];
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsMounted(true);
       const tableFromUrl = new URLSearchParams(window.location.search).get('table');
-      setTable(tableFromUrl ?? ''); // Default to an empty string if no table is found
+      setTable(tableFromUrl ?? '');
     }
   }, []);
 
-  if (!isMounted) {
-    return null; // Or some loading spinner if desired
-  }
+  if (!isMounted) return null;
 
   // Handle Order Button Click
   const handleOrder = (item: MenuItem) => {
     const quantity = quantities[item.id] || 0;
-    addToCart({ ...item, quantity, table }); // Add the item to the cart
-    router.push("/orders"); // Navigate to the cart page after adding the item
+    addToCart({ ...item, quantity, table });
+    router.push("/orders");
   };
 
   // Handle quantity increase
-  const increaseQuantity = (index: number) => {
-    setQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [index]: (prevQuantities[index] || 0) + 1,
-    }));
+  const increaseQuantity = (itemId: number) => {
+    const currentQuantity = quantities[itemId] || 0;
+    updateQuantity(itemId, currentQuantity + 1);
   };
 
   // Handle quantity decrease
-  const decreaseQuantity = (index: number) => {
-    setQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [index]: Math.max((prevQuantities[index] || 0) - 1, 0), // Prevent quantity going below 0
-    }));
+  const decreaseQuantity = (itemId: number) => {
+    const currentQuantity = quantities[itemId] || 0;
+    updateQuantity(itemId, Math.max(currentQuantity - 1, 0));
   };
 
   // Filter menu items based on the search query
   const filteredMenuItems = menuItems.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-
-  const toggleLike = (itemId: number) => {
-    setLikedItems((prevLikedItems) => ({
-      ...prevLikedItems,
-      [itemId]: !prevLikedItems[itemId], // Toggle the liked state for this specific item
-    }));
-  };
 
   return (
     <div className="min-h-screen bg-gray-10">
@@ -126,18 +84,9 @@ const MenuPage = () => {
 
       <div className="mt-4 max-w-4xl mx-auto px-4">
         {filteredMenuItems.length > 0 ? (
-          filteredMenuItems.map((item, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-4 mb-4 bg-gray-50 rounded-lg shadow-md"
-            >
-              <img
-                src={item.image}
-                alt={item.name}
-                width={64} // Set appropriate width and height
-                height={64}
-                className="w-16 h-16 object-cover rounded-3xl"
-              />
+          filteredMenuItems.map((item) => (
+            <div key={item.id} className="flex items-center justify-between p-4 mb-4 bg-gray-50 rounded-lg shadow-md">
+              <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-3xl" />
               <div className="ml-4 flex-1">
                 <h2 className="text-lg font-bold text-gray-800">{item.name}</h2>
                 <p className="text-sm text-gray-500">{item.description}</p>
@@ -145,19 +94,11 @@ const MenuPage = () => {
 
                 {/* Quantity Control Buttons */}
                 <div className="mt-4 flex items-center space-x-2">
-                  <button
-                    onClick={() => decreaseQuantity(item.id)}
-                    className="bg-white text-orange-500 px-2 py-[2px] rounded-lg"
-                  >
+                  <button onClick={() => decreaseQuantity(item.id)} className="bg-white text-orange-500 px-2 py-[2px] rounded-lg">
                     -
                   </button>
-                  <span className="text-gray-800 font-semibold">
-                    {quantities[item.id] || 0}
-                  </span>
-                  <button
-                    onClick={() => increaseQuantity(item.id)}
-                    className="bg-white text-orange-500 px-2 py-[2px] rounded-lg"
-                  >
+                  <span className="text-gray-800 font-semibold">{quantities[item.id] || 0}</span>
+                  <button onClick={() => increaseQuantity(item.id)} className="bg-white text-orange-500 px-2 py-[2px] rounded-lg">
                     +
                   </button>
                 </div>
@@ -165,19 +106,12 @@ const MenuPage = () => {
 
               {/* Wishlist Heart Icon and Order Button */}
               <div className="ml-4 flex flex-col items-center">
-                {/* Heart Icon */}
                 <button className="mb-6 ml-7 p-1 text-red-500 transition-colors duration-200" onClick={() => toggleLike(item.id)}>
-                  <HeartIcon  className={`h-8 w-8 cursor-pointer transition-all duration-300 ease-in-out 
-         ${likedItems[item.id] ? 'text-orange-500 fill-orange-600 scale-125' : 'text-red-500'}`} />
+                  <HeartIcon className={`h-8 w-8 cursor-pointer transition-all duration-300 ease-in-out ${likedItems[item.id] ? 'text-orange-500 fill-orange-600 scale-125' : 'text-red-500'}`} />
                 </button>
 
-                {/* Order Button */}
                 <button
-                  className={`bg-orange-500 text-white px-4 py-2 rounded-lg mt-5  ${
-                    quantities[item.id] > 0
-                      ? ""
-                      : "opacity-50 cursor-not-allowed"
-                  }`}
+                  className={`bg-orange-500 text-white px-4 py-2 rounded-lg mt-5 ${quantities[item.id] > 0 ? "" : "opacity-50 cursor-not-allowed"}`}
                   onClick={() => handleOrder(item)}
                   disabled={quantities[item.id] === 0}
                 >

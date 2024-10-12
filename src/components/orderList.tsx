@@ -1,15 +1,15 @@
 "use client";
 
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Modal from './Modal/Modal';
-import { ToastContainer, toast } from 'react-toastify'; // Import ToastContainer and toast
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useCart } from '@/context/CartContext'; // Import the Cart context
+import { useCart } from '@/context/CartContext';
 
 const Cart = () => {
   const router = useRouter();
-  const { cartItems, removeFromCart } = useCart(); // Get cartItems and removeFromCart
+  const { cartItems, removeFromCart, updateQuantity } = useCart();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Calculate subtotal, discount, and total
@@ -19,27 +19,37 @@ const Cart = () => {
 
   const handleBackBtn = () => {
     router.push('/');
-  }
+  };
 
- // Handle checkout button click
- const handleCheckout = () => {
-  if (cartItems.length === 0) {
-    // Show warning toast if the cart is empty
-    toast.warn("Your cart is empty! Add items before proceeding to checkout.", {
-      position: "top-right",
-      autoClose: 3000, // Automatically close after 3 seconds
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
-  } else {
-    // Add any additional checkout logic here (e.g., processing payment)
-    setIsModalOpen(true); // Open the modal if there are items in the cart
-  }
-};
+  const handleCheckout = () => {
+    if (cartItems.length === 0) {
+      toast.warn("Your cart is empty! Add items before proceeding to checkout.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
+    } else {
+      setIsModalOpen(true);
+    }
+  };
+
+  const increaseQuantity = (itemName) => {
+    const item = cartItems.find((i) => i.name === itemName);
+    updateQuantity(itemName, item.quantity + 1);
+  };
+
+  const decreaseQuantity = (itemName) => {
+    const item = cartItems.find((i) => i.name === itemName);
+    if (item.quantity > 1) {
+      updateQuantity(itemName, item.quantity - 1);
+    } else {
+      removeFromCart(itemName);
+    }
+  };
 
   return (
     <div className="bg-gray-50 p-4 min-h-screen">
@@ -52,8 +62,16 @@ const Cart = () => {
               <div>
                 <p className="font-semibold">{item.name}</p>
                 <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                <div className="flex items-center space-x-2 mt-2">
+                  <button onClick={() => decreaseQuantity(item.name)} className="bg-gray-200 px-2 rounded-lg">
+                    -
+                  </button>
+                  <span>{item.quantity}</span>
+                  <button onClick={() => increaseQuantity(item.name)} className="bg-gray-200 px-2 rounded-lg">
+                    +
+                  </button>
+                </div>
               </div>
-              {/* Display the price multiplied by the quantity correctly */}
               <p className="font-bold">₦{item.price * item.quantity}</p>
               <button
                 onClick={() => removeFromCart(item.name)}
@@ -98,11 +116,11 @@ const Cart = () => {
         {/* Buttons */}
         <div className="mt-6">
           <button className="w-full bg-orange-500 text-white py-3 rounded-lg mb-2"
-          onClick={handleCheckout}>
+            onClick={handleCheckout}>
             Proceed to Checkout
           </button>
           <button className="w-full bg-gray-100 text-orange-500 py-3 rounded-lg"
-          onClick={ () => handleBackBtn()}>
+            onClick={handleBackBtn}>
             Continue Shopping
           </button>
         </div>
