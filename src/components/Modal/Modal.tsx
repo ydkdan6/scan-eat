@@ -22,7 +22,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
   const handleOrderAgain = () => {
     setShowSecondModal(false); // Close second modal
-    router.push('/'); // Navigate to the menu page
+    window.location.href = '/'; // reload the menu page
   };
 
   const handleGoToBlankPage = () => {

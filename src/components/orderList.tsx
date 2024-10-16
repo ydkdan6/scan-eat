@@ -44,7 +44,12 @@ const Cart = () => {
   return (
     <div className="bg-gray-50 p-4 min-h-screen">
       <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
-        <h1 className="text-lg font-bold mb-4">Cart</h1>
+        
+        <div className='flex justify-between items-center mb-5'>
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+  <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
+</svg>        <h1 className="text-lg font-bold mb-4">Cart</h1>
+        </div>
 
         {cartItems.length > 0 ? (
           cartItems.map((item, index) => (
